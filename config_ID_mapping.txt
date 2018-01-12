@@ -1,0 +1,83 @@
+# ++++++++++++ JALOUSIE ++++++++++++++++++
+#EG jalousie
+interface:30:OFFICE
+interface:31:KITCHEN
+interface:32:LIVING
+interface:33:DININGSOUTH
+interface:34:DININGWEST
+
+#OG jalousie
+interface:35:PARENTS
+interface:36:BATH	
+interface:37:CHILDEASTEAST	
+interface:38:CHILDEASTSOUTH	
+interface:39:FLOOR	
+interface:40:CHILDWESTSOUTH	
+interface:41:CHILDWESTWEST
+
+# +++++++++++++ LIGHT ++++++++++++++++++
+#EG light
+interface:50:OFFICE_CEILING
+interface:51:BATH_CEILING
+interface:52:BATH_MIRROR
+interface:53:DINING_WEST
+interface:54:DINING_CEILING
+interface:55:LIVING_EASTNORTH
+interface:56:LIVING_EASTSOUTH
+interface:57:LIVING_SOUTH
+interface:58:FLOOR_WEST
+interface:59:FLOOR_EAST
+interface:60:ENTRYDOOR_UP
+interface:61:KITCHEN_CEILING
+interface:62:KITCHEN_CLOSET
+interface:63:KITCHEN_STORE
+interface:64:DUNGON_SERVER
+interface:65:DUNGON_HEATER
+interface:66:DUNGON_HOBBYEAST
+interface:67:DUNGON_HOBBYWEST
+interface:68:DUNGON_WASH
+interface:69:DUNGON_STAIRS
+interface:70:DUNGON_FLOOR
+interface:71:TERRACE_SOUTH
+interface:72:TERRACE_WEST
+interface:73:TERRACE_EAST
+interface:74:LIVING_CEILING_CORNER
+interface:75:KITCHEN_WALLBOARD
+
+#OG light
+interface:100:BATH_CEILING	
+interface:101:BATH_SHOWER	
+interface:102:BATH_MIRROR	
+interface:103:PARENTS_CEILING	
+interface:104:PARENTS_BED	
+interface:105:FLOOR_SOUTH	
+interface:106:FLOOR_NORTH	
+interface:107:CHILDEAST_GALLERY	
+interface:108:CHILDEAST_CEILING	
+interface:109:CHILDWEST_GALLERY	
+interface:110:CHILDWEST_CEILING	
+interface:111:STAIRS_EAST	
+interface:112:STAIRS_WEST	
+interface:113:CHILDWEST_PowerOutlet	
+
+
+# +++++++++++++ HEATER ++++++++++++++++++
+#EG heater
+interface:150:BATH
+interface:151:DINING
+interface:152:ENTRANCE
+interface:153:KITCHEN	
+interface:154:LIVING	
+interface:155:OFFICE
+interface:156:FLOOR	
+interface:157:HOBBY1	
+interface:158:HOBBY2	
+interface:159:WASHROOM	
+interface:160:SERVERROOM	
+
+#OG heater
+interface:161:BATHWALL	
+interface:162:BATHFLOOR	
+interface:163:CHILDEAST	
+interface:164:CHILDWEST	
+interface:165:PARENTS
