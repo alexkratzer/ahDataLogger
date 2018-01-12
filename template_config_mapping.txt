@@ -1,0 +1,18 @@
+#this is a comment
+#start server with defined port to listen @ PLCs
+
+#stream to data logger server
+#connect -> binary 
+#connect_diagnostic -> ascii
+
+connect:12345:PLC_1
+connect_diagnostic:23456:PLC_2
+
+#ip of data logger server
+LocalHost:192.xxx.xxx.xxx
+debug:1
+
+#some more vars
+bla : blie blub
+
+
