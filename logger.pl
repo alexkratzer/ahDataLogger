@@ -16,10 +16,9 @@
 
 use strict;
 use msg_dbg_print;
+use Cwd;
 
-#use lib '/volume1/homes/alex/dataLogger';
-my $workingDir = '/volume1/homes/git_repos/AH_dataLogger_pl/';
-#my $config_file = '/volume1/homes/git_repos/AutoHome_data-logger/config_mapping.txt';
+my $workingDir = getcwd()."/";#'/volume1/homes/git_repos/ahDataLogger/';
 my $config_file = 'config_mapping.txt';
 # my $log_file = '/volume1/homes/git_repos/AutoHome_data-logger/logger.log';
 
@@ -47,7 +46,8 @@ sub msg{
 
 #`nohup /volume1/homes/git_repos/AutoHome_data-logger/logger_EG.pl > /volume1/homes/git_repos/AutoHome_data-logger/logger_EG.out&`;
 sub start_prozess{
-	#my $ps = "/volume1/homes/git_repos/AutoHome_data-logger/$logger_prozess";
+	msg("start_prozess at workingDir: .$workingDir");
+	
 	my $ps = $workingDir . $logger_prozess;
 	foreach (@{$config{'connect'}}) {
 	    msg("try start prozess at listen port: $_");
