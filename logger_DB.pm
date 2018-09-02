@@ -3,7 +3,7 @@ use strict;
 use DBI;
 use msg_dbg_print;
 
-my $DBG = 0; # print more debug info if true 
+my $DBG =  0; # print more debug info if true 
 #my $DB_NAME = "";
 #my $DB_DSN = "DBI:mysql:database=$DB_NAME";
 #my $DB_USER = "auto_home";
@@ -162,12 +162,14 @@ sub diagnostic_DBG{
 			}	
 		}
 	} or do {
-		my $e = $@;
-		msg("#####################################", "logger_DB");
-		msg("error logger_DB; diagnostic_DBG: $e\n", "logger_DB");
-		msg("#####################################", "logger_DB");
-		print "error logger_DB; diagnostic_DBG: $e\n";
-  }
+		if($DBG){
+			my $e = $@;
+			msg("#####################################", "logger_DB");
+			msg("error logger_DB; diagnostic_DBG: $e\n", "logger_DB");
+			msg("#####################################", "logger_DB");
+			msg( "error logger_DB; diagnostic_DBG: $e\n"); 
+		}
+	}
 }
 
 

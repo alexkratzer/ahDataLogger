@@ -10,12 +10,12 @@
 # supportet ARGV:
 # "restart" -> restart all logger prozesses
 # "kill" -> kill all logger prozesses
-# "check" -> verify if $prozess_name is running
+# "status" -> verify which $logger_prozess are running
 #
 #=======================
 
 use strict;
-use msg_dbg_print;
+#use msg_dbg_print;
 use Cwd;
 
 my $workingDir = getcwd()."/";#'/volume1/homes/git_repos/ahDataLogger/';
@@ -24,14 +24,37 @@ my $config_file = 'config_mapping.txt';
 
 my $logger_prozess = "logger_prozess.pl";
 my $logger_diagnostic_prozess = "logger_diagnostic_prozess.pl";
+my $mqtListener = "mqtListener.pl";
 
 #stores config data from file: $config_file
 my %config;
 
 #print $msg to logfile
+#sub msg{
+#  my $msg = shift;
+#  msg_dbg_print::msg($msg,'main','logger');
+#}
+
+my $log_file = "logger.log";
 sub msg{
   my $msg = shift;
-  msg_dbg_print::msg($msg,'main','logger');
+  my $sender_plc = shift;
+  my $sender_module = shift;
+  
+  if(!defined($sender_plc)){
+	$sender_plc = "undef";
+  }
+  if(!defined($sender_module)){
+	$sender_module = "undef";
+  }
+  
+  
+  my $print_msg = localtime(time) . " [$sender_plc - $sender_module] $msg\n";
+  
+  open (my $fh, '>>', $log_file) or die "Kann Datei $log_file nicht zum Schreiben oeffnen: $!\n";
+  print $fh $print_msg; 
+  close $fh;
+  print $print_msg;
 }
 
 #sub msg{
@@ -52,7 +75,7 @@ sub start_prozess{
 	foreach (@{$config{'connect'}}) {
 	    msg("try start prozess at listen port: $_");
 		system("$ps $config{LocalHost} $_ $config{$_}  &");
-		sleep(1); #wartezeit damit subscript zeit für zugriff auf logdatei hat
+		sleep(1); #wartezeit damit subscript zeit fï¿½r zugriff auf logdatei hat
 	}
 	
 	#my $ps_diag = "/volume1/homes/git_repos/AutoHome_data-logger/$logger_diagnostic_prozess";
@@ -60,7 +83,14 @@ sub start_prozess{
 	foreach (@{$config{'connect_diagnostic'}}) {
 	    msg("try start diag prozess at listen port: $_");
 		system("$ps_diag $config{LocalHost} $_ $config{$_}  &");
-		sleep(1); #wartezeit damit subscript zeit für zugriff auf logdatei hat
+		sleep(1); #wartezeit damit subscript zeit fï¿½r zugriff auf logdatei hat
+	}
+
+	my $mqtListener = $workingDir . $mqtListener;
+	foreach (@{$config{'mqtListener'}}) {
+	    msg("try to start mqtListener prozess at port: $_");
+		system("$mqtListener $config{LocalHost} $_ $config{$_}  &");
+		sleep(1); #wartezeit damit subscript zeit fï¿½r zugriff auf logdatei hat
 	}
 }
 
@@ -77,13 +107,19 @@ sub kill_prozess{
 	else{ msg( "no prozess to kill exists "); }
 }
 
-#verify if $logger_prozess is running
+#verify which $logger_prozess are running
 sub check_ps{
 	my @prozess = `ps -aux`;
 	my $ps_id;
 	my @ps_list;
 	
-	msg("check process total: ".@prozess. " / connect: ".@{$config{'connect'}} . " / connect_diagnostic: " . @{$config{'connect_diagnostic'}});
+	msg(
+		"check process total: ".@prozess. 
+		" / connect: ".@{$config{'connect'}} . 
+		" / connect_diagnostic: " . @{$config{'connect_diagnostic'}} .
+		" / mqtListener: " . @{$config{'mqtListener'}}
+	
+	);
 	foreach(@prozess) {
 	  if ($_ =~ /$logger_prozess/ ) {
 		($ps_id) = $_ =~ m/(\d+)/;
@@ -93,6 +129,10 @@ sub check_ps{
 	  if ($_ =~ /$logger_diagnostic_prozess/ ) {
 		($ps_id) = $_ =~ m/(\d+)/;
 		#msg("found ps diag [".$logger_diagnostic_prozess."] with id: [".$ps_id."]");
+		push(@ps_list, $ps_id);
+	  }
+	  if ($_ =~ /$mqtListener/ ) {
+		($ps_id) = $_ =~ m/(\d+)/;
 		push(@ps_list, $ps_id);
 	  }
 	}
@@ -105,11 +145,18 @@ sub check_ps{
 sub count_running{
 	my @prozess = `ps -aux`;
 	
-	msg("check process running: ".@prozess. " / conf process: ".@{$config{'connect'}}. " / conf diag: " . @{$config{'connect_diagnostic'}});
+	msg(
+		"check process running: ".@prozess. 
+		" / conf process: ".@{$config{'connect'}}. 
+		" / conf diag: " . @{$config{'connect_diagnostic'}} . 
+		" / conf mqtListener: " . @{$config{'mqtListener'}}
+	
+	);
 	my $count = 0;
 	foreach(@prozess) {
 		if ($_ =~ /$logger_prozess/ ) { $count++;  }
 		if ($_ =~ /$logger_diagnostic_prozess/ ) { $count++;  }
+		if ($_ =~ /$mqtListener/ ) { $count++;  }
 	}
 	return $count;
 }
@@ -118,7 +165,7 @@ sub verify_connections{
 	my @prozess_list =  @{$_[0]};
 	msg("verify_connections prozess count: " . @prozess_list);
 	
-	my $conn_conf = @{$config{'connect'}} + @{$config{'connect_diagnostic'}};
+	my $conn_conf = @{$config{'connect'}} + @{$config{'connect_diagnostic'}} +  @{$config{'mqtListener'}};
 	my $conn_running = count_running();
 	
 	msg("conn_conf " . $conn_conf . " / conn_running " . $conn_running);
@@ -131,7 +178,7 @@ sub read_config_file{
 	#logger_DB::read_config_file("config_ID_mapping.txt");
 	
 	if(!defined($conf_file)){msg("call read_config_file with no param: conf_file");}
-	open (my $handle, '<', $conf_file) or die msg("Failed to open file: $!");
+	open (my $handle, '<', $conf_file) or die msg("\n \"$conf_file\": $! \n@" . getcwd() . "/$conf_file");
 	
 	my $row_count = 0;
 	while(<$handle>) { 
@@ -160,6 +207,11 @@ sub read_config_file{
 								#mapping port zu plc name
 								$config{$value} = $PLCname; 
 								push( @{$config{'connect_diagnostic'}}, $value); 
+							}
+							elsif($key eq 'mqtListener'){
+								#mapping port zu plc name
+								$config{$value} = $PLCname; 
+								push( @{$config{'mqtListener'}}, $value); 
 							}
 							#elsif($key eq 'interface'){
 							#	#mapping aktuatorID to aktuatorDescription
@@ -200,7 +252,7 @@ if($ARGV[0]){ msg( "========= start logger [$ARGV[0]] ===========");
 	kill_prozess(check_ps());
 	start_prozess();
 	check_ps();
-  }elsif($ARGV[0] eq "check"){
+  }elsif($ARGV[0] eq "status"){
     check_ps();
   }elsif($ARGV[0] eq "kill"){
     kill_prozess(check_ps());
